@@ -201,6 +201,30 @@ public class CompatibleHashMap<K, V> implements Map<K, V> {
         newNode.clearNext();
     }
 
+    public Iterator<K> keyIterator() {
+        return new Iterator<>() {
+            int bucketIndex = 0;
+            Node<K, ?> node = null;
+
+            @Override
+            public boolean hasNext() {
+                if (node != null) node = node.getNext();
+                if (node != null) return true;
+
+                while (++bucketIndex < hashTable.length) {
+                    node = hashTable[bucketIndex];
+                    if (node != null) return true;
+                }
+                return false;
+            }
+
+            @Override
+            public K next() {
+                return node.getKey();
+            }
+        };
+    }
+
     // Java Collections Map interface implementation
 
     @Override
@@ -236,7 +260,7 @@ public class CompatibleHashMap<K, V> implements Map<K, V> {
 
     @Override
     public Set<K> keySet() {
-        Set<K> resultSet = new HashSet<>();
+        Set<K> resultSet = new CompatibleSet<>();
         forEach((key, value) -> resultSet.add(key));
         return resultSet;
     }
@@ -250,7 +274,7 @@ public class CompatibleHashMap<K, V> implements Map<K, V> {
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        Set<Entry<K, V>> resultSet = new HashSet<>();
+        Set<Entry<K, V>> resultSet = new CompatibleSet<>();
         forEach((key, value) -> resultSet.add(Map.entry(key, value)));
         return resultSet;
     }
