@@ -168,7 +168,7 @@ public class CompatibleHashMap<K, V> implements Map<K, V> {
 
     private void resize(int newSize) {
         Node<K, V>[] newHashTable = (Node<K, V>[]) new Node[newSize];
-        forEachNode(node -> addNode(newHashTable, node));
+        forEachNode(node -> addNodeWithoutCheck(newHashTable, node));
         hashTable = newHashTable;
     }
 
@@ -182,23 +182,11 @@ public class CompatibleHashMap<K, V> implements Map<K, V> {
         }
     }
 
-    private void addNode(Node<K, V>[] targetHashTable, Node<K, V> newNode) {
+    private void addNodeWithoutCheck(Node<K, V>[] targetHashTable, Node<K, V> newNode) {
         int index = getBucketIndex(calcHash(newNode.getKey()), targetHashTable.length);
-
-        if (targetHashTable[index] == null) {
-            targetHashTable[index] = newNode;
-            newNode.clearNext();
-            return;
-        }
-
-        Node<K, V> oldNode = targetHashTable[index];
-
-        while (oldNode.hasNext()) {
-            oldNode = oldNode.getNext();
-        }
-
-        oldNode.setNext(newNode);
-        newNode.clearNext();
+        Node<K, V> oldHeadNode = targetHashTable[index];
+        newNode.setNext(oldHeadNode);
+        targetHashTable[index] = newNode;
     }
 
     // Java Collections Map interface implementation
