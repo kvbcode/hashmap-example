@@ -166,21 +166,9 @@ public class SimpleHashMap<K, V> {
 
     private void addNodeWithoutCheck(Node<K, V>[] targetHashTable, Node<K, V> newNode) {
         int index = getBucketIndex(calcHash(newNode.getKey()), targetHashTable.length);
-
-        if (targetHashTable[index] == null) {
-            targetHashTable[index] = newNode;
-            newNode.clearNext();
-            return;
-        }
-
-        Node<K, V> oldNode = targetHashTable[index];
-
-        while (oldNode.hasNext()) {
-            oldNode = oldNode.getNext();
-        }
-
-        oldNode.setNext(newNode);
-        newNode.clearNext();
+        Node<K, V> oldHeadNode = targetHashTable[index];
+        newNode.setNext(oldHeadNode);
+        targetHashTable[index] = newNode;
     }
 
 }
